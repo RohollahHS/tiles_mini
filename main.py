@@ -14,7 +14,7 @@ def parse_option():
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--split_ratios', type=list, default=[0.8, 0.1, 0.1])
 
-    parser.add_argument('--file_name', type=str, help='tiles_mini', default='tickets')
+    parser.add_argument('--file_name', type=str, help='tiles_mini', default='tiles_mini')
     parser.add_argument('--data_path', type=str, help='path to dataset', default='data')
     parser.add_argument('--output_dir', default='outputs', type=str, metavar='PATH')
 
