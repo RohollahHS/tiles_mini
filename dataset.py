@@ -34,7 +34,11 @@ class CustomDataset(data.Dataset):
         self.transform = transform
 
     def __getitem__(self, index):
-        x = self.transform(self.dataset[index][0])
+        if self.transform:
+            x = self.transform(self.dataset[index][0])
+        else:
+            x = self.dataset[index][0]
+        
         y = self.dataset[index][1]
         return x, y
     

@@ -6,6 +6,7 @@ import torch
 from model import create_model
 from utils import *
 
+
 def parse_option():
     parser = argparse.ArgumentParser('Tiles Mini Dataset', add_help=False)
     parser.add_argument('--device', default='cuda' if cuda.is_available() else 'cpu')
@@ -74,21 +75,22 @@ def validate(model, valid_loader, criterion):
     valid_running_loss = 0.0
     valid_running_correct = 0
     counter = 0
-    with torch.no_grad():
-        for i, data in tqdm(enumerate(valid_loader), total=len(valid_loader)):
-            counter += 1
-            
-            image, labels = data
-            image = image.to(DEVICE)
-            labels = labels.to(DEVICE)
 
+    for i, data in tqdm(enumerate(valid_loader), total=len(valid_loader)):
+        counter += 1
+        
+        image, labels = data
+        image = image.to(DEVICE)
+        labels = labels.to(DEVICE)
+        
+        with torch.no_grad():
             outputs = model(image)
 
-            loss = criterion(outputs, labels)
-            valid_running_loss += loss.item()
+        loss = criterion(outputs, labels)
+        valid_running_loss += loss.item()
 
-            _, preds = torch.max(outputs.data, 1)
-            valid_running_correct += (preds == labels).sum().item()
+        _, preds = torch.max(outputs.data, 1)
+        valid_running_correct += (preds == labels).sum().item()
         
     epoch_loss = valid_running_loss / counter
     epoch_acc = 100. * (valid_running_correct / len(valid_loader.dataset))
@@ -104,6 +106,10 @@ if __name__ == '__main__':
 
     train_loader, valid_loader, test_loader = create_dataloader(args)
 
+    print('\nNumber of train samples in train dataset:', len(train_loader.dataset))
+    print('Number of train samples in Validation dataset:', len(valid_loader.dataset))
+    print('Number of train samples in Test dataset:', len(test_loader.dataset))
+
     model, optimizer, criterion = create_model(args, num_classes=6)
 
     if args.resume:
@@ -116,7 +122,7 @@ if __name__ == '__main__':
         curr_epoch = 0
 
     for epoch in range(curr_epoch, EPOCHS):
-        print(f"[INFO]: Epoch {epoch+1} of {EPOCHS}")
+        print(f"Epoch {epoch+1} of {EPOCHS}")
         train_epoch_loss, train_epoch_acc = train(model, train_loader, optimizer, criterion)
         valid_epoch_loss, valid_epoch_acc = validate(model, valid_loader, criterion)
         train_loss.append(train_epoch_loss)

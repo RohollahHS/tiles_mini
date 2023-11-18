@@ -1,10 +1,9 @@
 import torch
-from utils import load_checkpoint
-from torchvision.models.resnet import resnet50
+from resnet import resnet18
 
 
 def create_model(args, num_classes):
-    model = resnet50(weights=None)
+    model = resnet18()
 
     try:
         check = torch.load(f'checkpoints/resnet50-11ad3fa6.pth')
@@ -13,7 +12,7 @@ def create_model(args, num_classes):
     except:
         pass
 
-    model.fc = torch.nn.Linear(2048, num_classes)
+    model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
     model.to(args.device)
 
     for p in model.parameters():
