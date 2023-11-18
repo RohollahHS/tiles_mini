@@ -64,7 +64,7 @@ def train(model, trainloader, optimizer, criterion):
         optimizer.step()
     
     epoch_loss = train_running_loss / counter
-    epoch_acc = train_running_correct / len(trainloader.dataset)
+    epoch_acc = 100. * (train_running_correct / len(trainloader.dataset))
     return epoch_loss, epoch_acc
 
 
@@ -91,7 +91,7 @@ def validate(model, valid_loader, criterion):
             valid_running_correct += (preds == labels).sum().item()
         
     epoch_loss = valid_running_loss / counter
-    epoch_acc = valid_running_correct / len(valid_loader.dataset)
+    epoch_acc = 100. * (valid_running_correct / len(valid_loader.dataset))
     return epoch_loss, epoch_acc
 
 

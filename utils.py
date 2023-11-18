@@ -77,7 +77,7 @@ class SaveBestModel:
         ):
             if loss < self.loss:
                 self.loss = loss
-                print(f"Saving best model for epoch: {epoch+1}\n")
+                print(f"Saving best model for epoch: {epoch+1}")
                 save(
                     {
                 "epoch": epoch + 1,
@@ -114,18 +114,15 @@ def save_loss_records(dir_path, file_name, loss=None, epoch=None, model_name=Non
 def save_plots(train_loss, valid_loss, train_accuracy, valid_accuracy, epoch, save_dir, model_name):
 
     plt.figure()
-    # pylab.xlim(0, epoch + 1)
-    plt.plot(range(1, epoch + 1), train_loss[:epoch+1], label='train_loss')
-    plt.plot(range(1, epoch + 1), valid_loss[:epoch+1], label='valid_loss')
+    plt.plot(range(0, epoch + 1), train_loss[:epoch+1], label='train_loss')
+    plt.plot(range(0, epoch + 1), valid_loss[:epoch+1], label='valid_loss')
     plt.legend()
     plt.savefig(os.path.join(save_dir, f'{model_name}_loss.pdf'))
     plt.close()
 
     plt.figure()
-    # pylab.xlim(0, epoch + 1)
-    # pylab.ylim(0, 1)
-    plt.plot(range(1, epoch + 1), train_accuracy[:epoch+1], label='train_accuracy')
-    plt.plot(range(1, epoch + 1), valid_accuracy[:epoch+1], label='valid_accuracy')
+    plt.plot(range(0, epoch + 1), train_accuracy[:epoch+1], label='train_accuracy')
+    plt.plot(range(0, epoch + 1), valid_accuracy[:epoch+1], label='valid_accuracy')
     plt.legend()
     plt.savefig(os.path.join(save_dir, f'{model_name}_accuracy.pdf'))
     plt.close()
