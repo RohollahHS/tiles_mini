@@ -13,13 +13,14 @@ def parse_option():
     
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--epochs', type=int, default=10)
-    parser.add_argument('--split_ratios', type=list, default=[0.8, 0.1, 0.1])
+    parser.add_argument('--split_ratios', type=list, default=[0.7, 0.2, 0.1])
+    parser.add_argument('--model_type', type=str, default='simple_cnn')
 
     parser.add_argument('--file_name', type=str, help='tiles_mini', default='tiles_mini')
     parser.add_argument('--data_path', type=str, help='path to dataset', default='data')
     parser.add_argument('--output_dir', default='outputs', type=str, metavar='PATH')
 
-    parser.add_argument('--num_workers', default=1, type=int)
+    parser.add_argument('--num_workers', default=2, type=int)
     parser.add_argument('--num_classes', default=6, type=int)
 
     parser.add_argument('--all_data', type=str, default=False, choices=[True, False])
@@ -110,7 +111,16 @@ if __name__ == '__main__':
     print('Number of train samples in Validation dataset:', len(valid_loader.dataset))
     print('Number of train samples in Test dataset:', len(test_loader.dataset))
 
-    model, optimizer, criterion = create_model(args, num_classes=6)
+    model = create_model(args).to(DEVICE)
+
+    n = 0
+    for p in model.parameters():
+        p.requires_grad_(True)
+        n += p.numel()
+    print('Number of parameters:', n)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=3e-6)
+    criterion = torch.nn.CrossEntropyLoss().to(args.device)
 
     if args.resume:
         model, optimizer, curr_epoch, train_loss, valid_loss, train_accuracy, valid_accuracy = load_checkpoint(model, optimizer, args)
