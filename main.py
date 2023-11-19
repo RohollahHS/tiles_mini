@@ -15,7 +15,7 @@ def parse_option():
     parser.add_argument('--device', default='cuda' if cuda.is_available() else 'cpu')
     # Train Options
     parser.add_argument('--batch_size', type=int, default=4)
-    parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--epochs', type=int, default=2)
     parser.add_argument('--model_type', type=str, default='simple_cnn')
     # Dataset Options
     parser.add_argument('--split_ratios', type=list, default=[0.7, 0.2, 0.1])
@@ -132,8 +132,8 @@ def validate(model, valid_loader, criterion):
 
 
 def inference(model, test_loader, args):
-    check = torch.load(f'{args.check_dir}/best_{args.model_name}.pth', args.device)
-    model.load_state_dict(check)
+    check = torch.load(f'{args.output_dir}/best_{args.model_name}.pth', args.device)
+    model.load_state_dict(check['model_state_dict'])
     print('\nBest Weights Loaded')
 
     model.eval()
