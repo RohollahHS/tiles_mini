@@ -24,7 +24,7 @@ def parse_option():
 
     parser.add_argument('--resume', help='resume from checkpoint', default=False, choices=[True, False])
 
-    parser.add_argument("--mnist", type=bool, default=False, choices=[True, False])
+    parser.add_argument("--mnist", type=bool, default=True, choices=[True, False])
     parser.add_argument("--server", type=str, default='local', choices=['local', 'colab'])
 
     parser.add_argument("--model_name", type=str, default="Debugging")
@@ -111,6 +111,7 @@ if __name__ == '__main__':
     print('\nNumber of train samples in train dataset:', len(train_loader.dataset))
     print('Number of train samples in Validation dataset:', len(valid_loader.dataset))
     print('Number of train samples in Test dataset:', len(test_loader.dataset))
+    print()
 
     model = create_model(args).to(DEVICE)
 
@@ -119,6 +120,7 @@ if __name__ == '__main__':
         p.requires_grad_(True)
         n += p.numel()
     print('Number of parameters:', n)
+    print()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=3e-6)
     criterion = torch.nn.CrossEntropyLoss().to(args.device)
