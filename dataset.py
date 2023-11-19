@@ -41,15 +41,15 @@ def create_dataloader(args):
                 test_loader = data.DataLoader(test_dataset, batch_size=batch_size, sampler=random_sampler)
     else:
         dataset = datasets.ImageFolder(root=f'{args.data_path}', transform=train_transform)
-        # train, valid, test = data.random_split(dataset, args.split_ratios)
+        train, valid, test = data.random_split(dataset, args.split_ratios)
 
-        # train_dataset = CustomDataset(train, train_transform)
-        # valid_dataset = CustomDataset(valid, valid_transform)
-        # test_dataset  = CustomDataset(test, valid_transform)
+        train_dataset = CustomDataset(train, train_transform)
+        valid_dataset = CustomDataset(valid, valid_transform)
+        test_dataset  = CustomDataset(test, valid_transform)
 
-        train_loader = data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
-        valid_loader = data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
-        test_loader  = data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
+        train_loader = data.DataLoader(train_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
+        valid_loader = data.DataLoader(valid_dataset, batch_size=batch_size, num_workers=num_workers)
+        test_loader  = data.DataLoader(test_dataset, batch_size=batch_size, num_workers=num_workers)
 
     num_classes = len(np.unique(dataset.targets))
 
