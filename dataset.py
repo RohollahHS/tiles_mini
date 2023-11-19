@@ -40,16 +40,17 @@ def create_dataloader(args):
                 random_sampler = data.RandomSampler(test_dataset, num_samples=30)
                 test_loader = data.DataLoader(test_dataset, batch_size=batch_size, sampler=random_sampler)
     else:
-        dataset = datasets.ImageFolder(root=f'{args.data_path}', transform=train_transform)
-        train, valid, test = data.random_split(dataset, args.split_ratios)
+        dataset = datasets.ImageFolder(root=f'{args.data_path}')
+        train_dataset, valid_dataset, test_dataset = data.random_split(dataset, args.split_ratios)
 
-        train_dataset = CustomDataset(train, train_transform)
-        valid_dataset = CustomDataset(valid, valid_transform)
-        test_dataset  = CustomDataset(test, valid_transform)
+        train_transform, valid_transform = create_transforms(args)
+        train_dataset = CustomDataset(train_dataset, train_transform)
+        valid_dataset = CustomDataset(valid_dataset, valid_transform)
+        test_dataset  = CustomDataset(test_dataset,  valid_transform)
 
         train_loader = data.DataLoader(train_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
         valid_loader = data.DataLoader(valid_dataset, batch_size=batch_size, num_workers=num_workers)
-        test_loader  = data.DataLoader(test_dataset, batch_size=batch_size, num_workers=num_workers)
+        test_loader  = data.DataLoader(test_dataset,  batch_size=batch_size, num_workers=num_workers)
 
     num_classes = len(np.unique(dataset.targets))
 
@@ -74,15 +75,25 @@ class CustomDataset(data.Dataset):
         return len(self.dataset)
 
 
+def create_transforms(args):
+    if args.rand_augment:
+        train_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandAugment(),
+        transforms.ToTensor(), 
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ])
+    else:
+        train_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(), 
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ])
 
-train_transform = transforms.Compose([
-                            transforms.Resize((224, 224)),
-                            torchvision.transforms.ToTensor(),
-                            torchvision.transforms.Normalize((0.1307,), (0.3081,))
-                            ])
+    valid_transform = transforms.Compose([
+    transforms.Resize((224, 224)), 
+    transforms.ToTensor(), 
+    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+    ])
 
-valid_transform = transforms.Compose([
-                            transforms.Resize((224, 224)),
-                            torchvision.transforms.ToTensor(),
-                            torchvision.transforms.Normalize((0.1307,), (0.3081,))
-                            ])
+    return train_transform, valid_transform

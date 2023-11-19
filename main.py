@@ -5,28 +5,32 @@ from tqdm.auto import tqdm
 import torch
 from model import create_model
 from utils import *
+import numpy as np
+from torch.autograd import Variable
 
 
 def parse_option():
     parser = argparse.ArgumentParser('Tiles Mini Dataset', add_help=False)
+    # Defining Device
     parser.add_argument('--device', default='cuda' if cuda.is_available() else 'cpu')
-    
+    # Train Options
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--epochs', type=int, default=10)
-    parser.add_argument('--split_ratios', type=list, default=[0.7, 0.2, 0.1])
     parser.add_argument('--model_type', type=str, default='simple_cnn')
-
-    parser.add_argument('--file_name', type=str, help='tiles_mini', default='tiles_mini')
+    # Dataset Options
+    parser.add_argument('--split_ratios', type=list, default=[0.7, 0.2, 0.1])
+    parser.add_argument("--mnist", type=bool, default=False, choices=[True, False])
+    # Directory Options
     parser.add_argument('--data_path', type=str, help='path to dataset', default='data/tiles_mini')
     parser.add_argument('--output_dir', default='outputs', type=str, metavar='PATH')
     parser.add_argument('--check_dir', default='checkpoints', type=str, metavar='PATH')
+    # Data Augmentation Options
+    parser.add_argument('--mix_up', default=True, type=bool)
+    parser.add_argument('--rand_augment', default=True, type=bool)
 
     parser.add_argument('--num_workers', default=0, type=int)
 
     parser.add_argument('--resume', help='resume from checkpoint', default=False, choices=[True, False])
-
-    parser.add_argument("--mnist", type=bool, default=True, choices=[True, False])
-    parser.add_argument("--server", type=str, default='local', choices=['local', 'colab'])
 
     parser.add_argument("--model_name", type=str, default="Debugging")
 
@@ -38,6 +42,28 @@ def parse_option():
     print()
 
     return args
+
+
+def mixup_data(x, y, alpha=0.4, device='cpu'):
+    '''Returns mixed inputs, pairs of targets, and lambda'''
+    if alpha > 0:
+        lam = np.random.beta(alpha, alpha)
+    else:
+        lam = 1
+
+    batch_size = x.size()[0]
+    if device == 'cuda':
+        index = torch.randperm(batch_size).to(device)
+    else:
+        index = torch.randperm(batch_size)
+
+    mixed_x = lam * x + (1 - lam) * x[index, :]
+    y_a, y_b = y, y[index]
+    return mixed_x, y_a, y_b, lam
+
+
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
 
 
 # training
@@ -54,9 +80,15 @@ def train(model, trainloader, optimizer, criterion):
         labels = labels.to(DEVICE)
         optimizer.zero_grad()
 
-        outputs = model(image)
-
-        loss = criterion(outputs, labels)
+        if args.mix_up:
+            image, targets_a, targets_b, lam = mixup_data(image, labels, device=DEVICE)
+            image, targets_a, targets_b = map(Variable, (image, targets_a, targets_b))
+            outputs = model(image)
+            loss = mixup_criterion(criterion, outputs, targets_a, targets_b, lam)
+        else:
+            outputs = model(image)
+            loss = criterion(outputs, labels)
+        
         train_running_loss += loss.item()
 
         _, preds = torch.max(outputs.data, 1)
