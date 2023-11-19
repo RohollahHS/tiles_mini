@@ -10,4 +10,5 @@ rm -r 'data/content'
 rm data/tiles_mini.zip
 
 wget 'https://download.pytorch.org/models/resnet50-11ad3fa6.pth'
+wget 'https://download.pytorch.org/models/resnet18-f37072fd.pth'
 mv resnet50-11ad3fa6.pth checkpoints/

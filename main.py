@@ -19,6 +19,7 @@ def parse_option():
     parser.add_argument('--file_name', type=str, help='tiles_mini', default='tiles_mini')
     parser.add_argument('--data_path', type=str, help='path to dataset', default='data/tiles_mini')
     parser.add_argument('--output_dir', default='outputs', type=str, metavar='PATH')
+    parser.add_argument('--check_dir', default='checkpoints', type=str, metavar='PATH')
 
     parser.add_argument('--num_workers', default=0, type=int)
 
@@ -98,6 +99,42 @@ def validate(model, valid_loader, criterion):
     return epoch_loss, epoch_acc
 
 
+def inference(model, test_loader, args):
+    check = torch.load(f'{args.check_dir}/best_{args.model_name}.pth', args.device)
+    model.load_state_dict(check)
+    print('\nBest Weights Loaded')
+
+    model.eval()
+    print('Inference')
+    test_running_loss = 0.0
+    test_running_correct = 0
+    counter = 0
+
+    for i, data in tqdm(enumerate(test_loader), total=len(test_loader)):
+        counter += 1
+        
+        image, labels = data
+        image = image.to(DEVICE)
+        labels = labels.to(DEVICE)
+        
+        with torch.no_grad():
+            outputs = model(image)
+
+        loss = criterion(outputs, labels)
+        test_running_loss += loss.item()
+
+        _, preds = torch.max(outputs.data, 1)
+        test_running_correct += (preds == labels).sum().item()
+        
+    epoch_loss = test_running_loss / counter
+    epoch_acc = 100. * (test_running_correct / len(test_loader.dataset))
+
+    print(f"Test loss: {epoch_loss:.3f}, Test acc: {epoch_acc:.3f}")
+
+    return epoch_loss, epoch_acc
+
+
+
 if __name__ == '__main__':
     args = parse_option()
     EPOCHS = args.epochs
@@ -153,3 +190,4 @@ if __name__ == '__main__':
 
         print('-'*50)
 
+    inference(model, test_loader, args)
