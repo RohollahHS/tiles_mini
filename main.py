@@ -24,7 +24,7 @@ def parse_option():
 
     parser.add_argument('--resume', help='resume from checkpoint', default=False, choices=[True, False])
 
-    parser.add_argument("--mnist", type=bool, default=True, choices=[True, False])
+    parser.add_argument("--mnist", type=bool, default=False, choices=[True, False])
     parser.add_argument("--server", type=str, default='local', choices=['local', 'colab'])
 
     parser.add_argument("--model_name", type=str, default="Debugging")
