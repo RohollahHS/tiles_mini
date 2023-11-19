@@ -17,15 +17,15 @@ def parse_option():
     parser.add_argument('--model_type', type=str, default='simple_cnn')
 
     parser.add_argument('--file_name', type=str, help='tiles_mini', default='tiles_mini')
-    parser.add_argument('--data_path', type=str, help='path to dataset', default='data')
+    parser.add_argument('--data_path', type=str, help='path to dataset', default='data/tiles_mini')
     parser.add_argument('--output_dir', default='outputs', type=str, metavar='PATH')
 
-    parser.add_argument('--num_workers', default=2, type=int)
-    parser.add_argument('--num_classes', default=6, type=int)
-
-    parser.add_argument('--all_data', type=str, default=False, choices=[True, False])
+    parser.add_argument('--num_workers', default=0, type=int)
 
     parser.add_argument('--resume', help='resume from checkpoint', default=False, choices=[True, False])
+
+    parser.add_argument("--mnist", type=bool, default=True, choices=[True, False])
+    parser.add_argument("--server", type=str, default='local', choices=['local', 'colab'])
 
     parser.add_argument("--model_name", type=str, default="Debugging")
 
@@ -105,7 +105,8 @@ if __name__ == '__main__':
     MODEL_NAME = args.model_name
     OUTPUT_DIR = args.output_dir
 
-    train_loader, valid_loader, test_loader = create_dataloader(args)
+    train_loader, valid_loader, test_loader, num_classes = create_dataloader(args)
+    args.num_classes = num_classes
 
     print('\nNumber of train samples in train dataset:', len(train_loader.dataset))
     print('Number of train samples in Validation dataset:', len(valid_loader.dataset))

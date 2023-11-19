@@ -7,7 +7,10 @@ from resnet import resnet18
 class Net(nn.Module):
     def __init__(self, args):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, 5)
+        if args.mnist:
+            self.conv1 = nn.Conv2d(1, 32, 5)
+        else:
+            self.conv1 = nn.Conv2d(3, 32, 5)
         self.conv2 = nn.Conv2d(32, 64, 5)
         self.conv3 = nn.Conv2d(64, 128, 3)
         self.conv4 = nn.Conv2d(128, 256, 5)
