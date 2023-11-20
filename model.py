@@ -36,6 +36,7 @@ def create_model(args):
     elif args.model_type == 'resnet':
         resnet = resnet18()
         check = torch.load(f'{args.check_dir}/resnet18-f37072fd.pth', args.device)
-        resnet.load_state_dict(check)
+        print('\nLoading IMAGENET weights:', resnet.load_state_dict(check))
+        print()
         resnet.fc = torch.nn.Linear(resnet.fc.in_features, args.num_classes)
         return resnet
