@@ -16,23 +16,23 @@ def parse_option():
     # Train Options
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--epochs', type=int, default=2)
-    parser.add_argument('--model_type', type=str, default='simple_cnn')
+    parser.add_argument('--model_type', type=str, default='resnet')
     # Dataset Options
-    parser.add_argument('--split_ratios', type=list, default=[0.7, 0.2, 0.1])
+    parser.add_argument('--split_ratios', type=list, default=[0.8, 0.1, 0.1])
     parser.add_argument("--mnist", type=bool, default=False, choices=[True, False])
     # Directory Options
     parser.add_argument('--data_path', type=str, help='path to dataset', default='data/tiles_mini')
     parser.add_argument('--output_dir', default='outputs', type=str, metavar='PATH')
     parser.add_argument('--check_dir', default='checkpoints', type=str, metavar='PATH')
     # Data Augmentation Options
-    parser.add_argument('--mix_up', default=True, type=bool)
-    parser.add_argument('--rand_augment', default=True, type=bool)
+    parser.add_argument('--mix_up', default=False, type=bool)
+    parser.add_argument('--rand_augment', default=False, type=bool)
 
     parser.add_argument('--num_workers', default=0, type=int)
 
     parser.add_argument('--resume', help='resume from checkpoint', default=False, choices=[True, False])
 
-    parser.add_argument("--model_name", type=str, default="Debugging")
+    parser.add_argument("--model_name", type=str, default="ResNet18_with_TL_and_no_AUG")
 
     args = parser.parse_args()
     

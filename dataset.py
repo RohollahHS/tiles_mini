@@ -3,6 +3,7 @@
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from torch.utils import data
+from torch import Generator
 import torchvision
 import numpy as np
 
@@ -41,7 +42,7 @@ def create_dataloader(args):
                 test_loader = data.DataLoader(test_dataset, batch_size=batch_size, sampler=random_sampler)
     else:
         dataset = datasets.ImageFolder(root=f'{args.data_path}')
-        train_dataset, valid_dataset, test_dataset = data.random_split(dataset, args.split_ratios)
+        train_dataset, valid_dataset, test_dataset = data.random_split(dataset, args.split_ratios, generator=Generator().manual_seed(42))
 
         train_transform, valid_transform = create_transforms(args)
         train_dataset = CustomDataset(train_dataset, train_transform)
